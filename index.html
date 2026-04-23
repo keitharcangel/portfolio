@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keith Daniel Arcangel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0b0b0b;
+  --black-2: #141312;
+  --black-3: #1c1b19;
+  --white: #eae5db;
+  --white-2: #cdc7bb;
+  --gray: #8a847a;
+  --gray-2: #5c5750;
+  --gray-3: #3a3733;
+  --copper: #e0874a;
+  --copper-dim: rgba(224,135,74,0.08);
+  --copper-glow: rgba(224,135,74,0.25);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'Manrope', system-ui, sans-serif;
+  --mono: 'Space Mono', monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+::selection { background: var(--copper); color: var(--black); }
+
+/* Progress */
+#prog {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--copper); z-index: 9999; width: 0;
+  pointer-events: none;
+}
+
+/* Loader */
+#loader {
+  position: fixed; inset: 0; z-index: 10000;
+  background: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+#loader.gone { opacity: 0; visibility: hidden; }
+#loader span {
+  font-family: var(--mono); font-size: .6rem;
+  letter-spacing: .4em; text-transform: uppercase;
+  color: var(--gray); animation: pulse 1.2s ease infinite;
+}
+@keyframes pulse { 0%,100% { opacity:.3; } 50% { opacity:1; } }
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 60px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 clamp(2rem,5vw,5rem);
+  background: rgba(11,11,11,0.5);
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(234,229,219,0.04);
+}
+.logo { font-family: var(--serif); font-size: .95rem; color: var(--white); text-decoration: none; }
+.nv { display: flex; gap: 2rem; align-items: center; }
+.nv a {
+  font-size: .6rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gray);
+  text-decoration: none; transition: color .2s;
+}
+.nv a:hover { color: var(--white); }
+.nv .nv-cta {
+  color: var(--copper); border: 1px solid rgba(224,135,74,0.3);
+  padding: .35rem 1rem; transition: all .2s;
+}
+.nv .nv-cta:hover { background: var(--copper); color: var(--black); }
+.ham { display:none; cursor:pointer; flex-direction:column; gap:5px; z-index:300; padding:4px; }
+.ham span { display:block; width:20px; height:1.5px; background:var(--white); transition:all .3s; }
+.ham.on span:nth-child(1) { transform:rotate(45deg) translate(4px,5px); }
+.ham.on span:nth-child(2) { opacity:0; }
+.ham.on span:nth-child(3) { transform:rotate(-45deg) translate(4px,-5px); }
+.mbl { display:none; position:fixed; inset:0; z-index:199; background:var(--black); flex-direction:column; align-items:center; justify-content:center; gap:2rem; opacity:0; visibility:hidden; transition:all .3s; }
+.mbl.on { opacity:1; visibility:visible; }
+.mbl a { font-family:var(--serif); font-size:2rem; color:var(--white); text-decoration:none; }
+.mbl a:hover { color:var(--copper); }
+
+/* ── Shared ── */
+.w { max-width: 1100px; margin: 0 auto; padding: 0 clamp(2rem,5vw,5rem); }
+.lb {
+  font-family: var(--mono); font-size: .52rem; font-weight: 700;
+  letter-spacing: .32em; text-transform: uppercase; color: var(--copper);
+  margin-bottom: .75rem;
+}
+.rv { opacity:0; transform:translateY(16px); transition:opacity .6s var(--ease), transform .6s var(--ease); }
+.rv.v { opacity:1; transform:none; }
+.d1 { transition-delay:.08s } .d2 { transition-delay:.16s } .d3 { transition-delay:.24s }
+
+@keyframes rise {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh; display: flex; align-items: flex-end;
+  padding: 0 0 clamp(4rem,8vh,6rem) 0;
+  position: relative; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+}
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.hero-orb-1 {
+  width: 500px; height: 500px;
+  top: -10%; right: -5%;
+  background: rgba(224,135,74,0.06);
+  animation: drift 25s ease infinite;
+}
+.hero-orb-2 {
+  width: 300px; height: 300px;
+  bottom: 10%; left: 10%;
+  background: rgba(224,135,74,0.03);
+  animation: drift 18s ease infinite reverse;
+}
+@keyframes drift {
+  0%,100% { transform:translate(0,0); }
+  33% { transform:translate(20px,-15px); }
+  66% { transform:translate(-15px,10px); }
+}
+
+.hero-inner { position: relative; z-index: 2; width: 100%; }
+.hero-tag {
+  font-family: var(--mono); font-size: .55rem; font-weight: 400;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--copper);
+  margin-bottom: 1.5rem;
+  opacity: 0; animation: rise .5s var(--ease) .4s forwards;
+}
+.hero-name {
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 10vw, 9rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.035em;
+  margin-bottom: 1.5rem;
+}
+.hn-line { display: block; overflow: visible; padding-bottom: .1em; }
+.hn-word {
+  display: inline-block;
+  opacity: 0; animation: rise .55s var(--ease) forwards;
+}
+.hn-line:nth-child(1) .hn-word:nth-child(1) { animation-delay:.5s }
+.hn-line:nth-child(1) .hn-word:nth-child(2) { animation-delay:.6s }
+.hn-line:nth-child(2) .hn-word { animation-delay:.7s; font-style:italic; color:var(--copper); }
+
+.hero-sub {
+  max-width: 480px;
+  font-size: .92rem; font-weight: 400;
+  color: var(--white-2); line-height: 1.8;
+  opacity: 0; animation: rise .5s var(--ease) .85s forwards;
+}
+.hero-btns {
+  margin-top: 2rem; display: flex; gap: .75rem; flex-wrap: wrap;
+  opacity: 0; animation: rise .5s var(--ease) 1s forwards;
+}
+.btn {
+  display: inline-block; padding: .7rem 1.5rem;
+  font-family: var(--sans); font-size: .6rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: all .25s var(--ease);
+}
+.btn-copper { background: var(--copper); color: var(--black); }
+.btn-copper:hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(224,135,74,0.25); }
+.btn-wire { background: transparent; color: var(--gray); border: 1px solid var(--gray-3); }
+.btn-wire:hover { border-color: var(--copper); color: var(--copper); }
+
+/* ── Proof Strip ── */
+.proof {
+  border-top: 1px solid rgba(234,229,219,0.04);
+  border-bottom: 1px solid rgba(234,229,219,0.04);
+  background: var(--black-2);
+}
+.proof-grid {
+  display: grid; grid-template-columns: repeat(5,1fr);
+}
+.proof-cell {
+  padding: 2rem 1rem; text-align: center;
+  border-right: 1px solid rgba(234,229,219,0.04);
+  transition: background .3s;
+}
+.proof-cell:last-child { border-right: none; }
+.proof-cell:hover { background: rgba(224,135,74,0.03); }
+.pv {
+  font-family: var(--serif); font-size: clamp(1.6rem,2.5vw,2.2rem);
+  color: var(--white); line-height: 1;
+  transition: color .3s;
+}
+.proof-cell:hover .pv { color: var(--copper); }
+.pv .cnt { display: inline; }
+.pl {
+  margin-top: .25rem;
+  font-size: .52rem; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--gray-2);
+}
+
+/* ── Case Study ── */
+.case {
+  padding: clamp(5rem,8vw,9rem) 0;
+  border-bottom: 1px solid rgba(234,229,219,0.04);
+}
+.case-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 3.5rem; gap: 2rem; flex-wrap: wrap;
+}
+.case-header h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem,3vw,2.4rem);
+  font-weight: 400; line-height: 1.15;
+}
+.case-header h2 .hl { color: var(--copper); font-style: italic; }
+.case-header .case-tag {
+  font-family: var(--mono); font-size: .5rem; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--black); background: var(--copper);
+  padding: .3rem .8rem; white-space: nowrap; flex-shrink: 0;
+}
+
+.case-body {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem,4vw,4rem);
+}
+.case-body p {
+  font-size: .9rem; color: var(--white-2); line-height: 1.9;
+  margin-bottom: 1rem;
+}
+.case-pull {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(234,229,219,0.06);
+  border-bottom: 1px solid rgba(234,229,219,0.06);
+  margin: 1.5rem 0;
+}
+.case-pull p {
+  font-family: var(--serif); font-style: italic;
+  font-size: 1.15rem; color: var(--white);
+  line-height: 1.55; margin: 0;
+}
+.case-metrics {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+  margin-top: 1rem;
+}
+.cm {
+  padding: 1rem 1.25rem;
+  background: var(--black-3);
+  border: 1px solid rgba(234,229,219,0.04);
+}
+.cm-v { font-family: var(--serif); font-size: 1.5rem; color: var(--copper); line-height: 1; }
+.cm-l { font-size: .5rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-2); margin-top: .2rem; }
+
+/* ── Timeline ── */
+.timeline {
+  padding: clamp(5rem,8vw,8rem) 0;
+}
+.tl-head { margin-bottom: 3rem; }
+.tl-head h2 {
+  font-family: var(--serif); font-size: clamp(1.6rem,3vw,2.4rem);
+  font-weight: 400; line-height: 1.15;
+}
+.tl-head h2 .hl { color: var(--copper); font-style: italic; }
+
+.tl-item {
+  display: grid; grid-template-columns: 160px 1px 1fr;
+  gap: 2rem; min-height: 100px;
+}
+.tl-date {
+  font-family: var(--mono); font-size: .52rem; font-weight: 400;
+  letter-spacing: .1em; color: var(--gray-2);
+  text-align: right; padding-top: .35rem;
+}
+.tl-line {
+  background: rgba(234,229,219,0.06); position: relative;
+}
+.tl-line::before {
+  content: ''; position: absolute; top: .4rem; left: 50%;
+  transform: translateX(-50%);
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--copper);
+}
+.tl-content { padding-bottom: 2.5rem; }
+.tl-co {
+  font-family: var(--serif); font-size: 1.2rem; color: var(--white);
+}
+.tl-role {
+  font-size: .68rem; font-weight: 600; color: var(--copper);
+  letter-spacing: .03em; margin-bottom: .5rem;
+}
+.tl-content p {
+  font-size: .82rem; color: var(--gray); line-height: 1.8;
+}
+
+/* ── Expertise ── */
+.expertise {
+  padding: clamp(5rem,8vw,8rem) 0;
+  background: var(--black-2);
+  border-top: 1px solid rgba(234,229,219,0.04);
+  border-bottom: 1px solid rgba(234,229,219,0.04);
+}
+.ex-head { margin-bottom: 2.5rem; }
+.ex-head h2 {
+  font-family: var(--serif); font-size: clamp(1.6rem,3vw,2.4rem);
+  font-weight: 400; line-height: 1.15;
+}
+.ex-head h2 .hl { color: var(--copper); font-style: italic; }
+.ex-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .75rem;
+}
+.ex-card {
+  background: var(--black);
+  border: 1px solid rgba(234,229,219,0.04);
+  padding: 1.75rem;
+  transition: all .3s var(--ease);
+  position: relative;
+}
+.ex-card::after {
+  content: ''; position: absolute; inset: 0;
+  border: 1px solid var(--copper); opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+.ex-card:hover { transform: translateY(-3px); }
+.ex-card:hover::after { opacity: 1; }
+.ex-n {
+  font-family: var(--mono); font-size: .45rem; font-weight: 700;
+  letter-spacing: .2em; color: var(--gray-3); margin-bottom: .6rem;
+}
+.ex-card h3 {
+  font-family: var(--serif); font-size: 1rem; color: var(--white);
+  margin-bottom: .35rem;
+}
+.ex-card p { font-size: .72rem; color: var(--gray); line-height: 1.7; }
+
+/* ── Tools ── */
+.tools-strip {
+  padding: 1.75rem 0;
+  background: var(--black-3);
+  border-bottom: 1px solid rgba(234,229,219,0.04);
+}
+.tools-inner {
+  display: flex; align-items: center; gap: 2rem;
+  justify-content: center; flex-wrap: wrap;
+}
+.tools-inner span {
+  font-family: var(--mono); font-size: .52rem; font-weight: 400;
+  letter-spacing: .06em; color: var(--gray-2);
+  transition: color .2s;
+}
+.tools-inner span:hover { color: var(--copper); }
+.tools-sep { color: var(--gray-3) !important; }
+
+/* ── Education ── */
+.edu { padding: clamp(3rem,5vw,5rem) 0; }
+.edu-row { display: flex; align-items: center; gap: 1.5rem; }
+.edu-mark {
+  width: 3px; height: 40px; background: var(--copper); flex-shrink: 0;
+}
+.edu-deg { font-family: var(--serif); font-size: 1rem; color: var(--white); }
+.edu-sch { font-size: .7rem; color: var(--gray); }
+
+/* ── Contact ── */
+.contact {
+  padding: clamp(6rem,10vw,10rem) 0;
+  text-align: center;
+  position: relative;
+}
+.contact::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,135,74,0.04), transparent 70%);
+  pointer-events: none;
+}
+.contact h2 {
+  font-family: var(--serif);
+  font-size: clamp(2rem,4.5vw,3.5rem);
+  font-weight: 400; line-height: 1.1; margin-bottom: .75rem;
+}
+.contact h2 .hl { color: var(--copper); font-style: italic; }
+.contact-p {
+  font-size: .88rem; color: var(--gray); line-height: 1.8;
+  max-width: 380px; margin: 0 auto 2.5rem;
+}
+.cl-row {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: .6rem; margin-bottom: 2rem;
+}
+.cl {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .55rem 1.1rem;
+  background: var(--black-2);
+  border: 1px solid rgba(234,229,219,0.05);
+  text-decoration: none; color: var(--gray);
+  font-size: .68rem; font-weight: 500;
+  transition: all .25s;
+}
+.cl:hover { border-color: var(--copper); color: var(--copper); transform: translateY(-2px); }
+.cl svg { width: 12px; height: 12px; stroke: var(--copper); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+
+/* ── Footer ── */
+footer {
+  padding: 1.5rem clamp(2rem,5vw,5rem);
+  border-top: 1px solid rgba(234,229,219,0.04);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .48rem; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--gray-3);
+}
+
+/* ── Responsive ── */
+@media (max-width:900px) {
+  .nv { display:none; }
+  .ham { display:flex; }
+  .mbl { display:flex; }
+  .proof-grid { grid-template-columns:repeat(3,1fr); }
+  .proof-cell:nth-child(3) { border-right:none; }
+  .proof-cell:nth-child(4), .proof-cell:nth-child(5) { border-top:1px solid rgba(234,229,219,0.04); }
+  .case-body { grid-template-columns:1fr; }
+  .case-metrics { grid-template-columns:1fr 1fr; }
+  .tl-item { grid-template-columns:1fr; gap:.5rem; }
+  .tl-date { text-align:left; }
+  .tl-line { display:none; }
+  .ex-grid { grid-template-columns:1fr; }
+  footer { flex-direction:column; gap:.5rem; text-align:center; }
+}
+@media (max-width:500px) {
+  .proof-grid { grid-template-columns:1fr 1fr; }
+  .proof-cell:nth-child(2) { border-right:none; }
+  .proof-cell:nth-child(3) { border-right:1px solid rgba(234,229,219,0.04); }
+  .proof-cell { border-bottom:1px solid rgba(234,229,219,0.04); }
+  .hero-btns { flex-direction:column; }
+  .hero-btns .btn { width:100%; text-align:center; }
+  .case-metrics { grid-template-columns:1fr; }
+  .cl-row { flex-direction:column; align-items:stretch; }
+  .cl { justify-content:center; }
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<div id="loader"><span>Loading</span></div>
+
+<nav>
+  <a href="#" class="logo">KDA</a>
+  <div class="nv">
+    <a href="#story">Story</a>
+    <a href="#path">Path</a>
+    <a href="#expertise">Expertise</a>
+    <a href="#contact" class="nv-cta">Let's Talk</a>
+  </div>
+  <div class="ham" id="ham"><span></span><span></span><span></span></div>
+</nav>
+<div class="mbl" id="mbl">
+  <a href="#story">Story</a>
+  <a href="#path">Path</a>
+  <a href="#expertise">Expertise</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+  </div>
+  <div class="w hero-inner">
+    <div class="hero-tag">Executive Partner / Athena × Polymarket</div>
+    <h1 class="hero-name">
+      <span class="hn-line"><span class="hn-word">Keith</span> <span class="hn-word">Daniel</span></span>
+      <span class="hn-line"><span class="hn-word">Arcangel</span></span>
+    </h1>
+    <p class="hero-sub">I don't manage calendars. I architect executive capacity, safeguard billion-dollar pipelines, and build the systems that turn bandwidth into breakthroughs.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn btn-copper">Work With Me</a>
+      <a href="#story" class="btn btn-wire">The Full Story</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROOF STRIP ═══ -->
+<section class="proof">
+  <div class="proof-grid rv">
+    <div class="proof-cell"><div class="pv">$<span class="cnt" data-t="9">0</span>B</div><div class="pl">Valuation Reached</div></div>
+    <div class="proof-cell"><div class="pv">$<span class="cnt" data-t="125">0</span>M</div><div class="pl">Series C Closed</div></div>
+    <div class="proof-cell"><div class="pv"><span class="cnt" data-t="30">0</span>+</div><div class="pl">Hours Reclaimed / Wk</div></div>
+    <div class="proof-cell"><div class="pv">$<span class="cnt" data-t="2">0</span>B+</div><div class="pl">Pipeline Managed</div></div>
+    <div class="proof-cell"><div class="pv"><span class="cnt" data-t="50">0</span>%</div><div class="pl">Faster Hiring</div></div>
+  </div>
+</section>
+
+<!-- ═══ CASE STUDY ═══ -->
+<section class="case" id="story">
+  <div class="w">
+    <div class="case-header rv">
+      <h2>The <span class="hl">Polymarket</span> Story</h2>
+      <div class="case-tag">Featured Engagement</div>
+    </div>
+    <div class="case-body">
+      <div class="rv">
+        <p>When I joined as Executive Partner, my client was a Director of Strategic Finance at a fast-scaling prediction market. Within four months, I catalyzed his promotion to Vice President, putting him on the CFO track at one of the most talked-about companies in DeFi.</p>
+        <p>I became the hidden hand behind investor readiness. Transforming complex earnings calls and financial documents into decision-ready briefs that halved preparation time. Every high-stakes meeting was engineered for execution accuracy before my client walked in the room.</p>
+        <div class="case-pull">
+          <p>"I don't manage time. I architect days. I reclaimed over 30 hours of executive bandwidth every single week."</p>
+        </div>
+      </div>
+      <div class="rv d1">
+        <p>I built the systems that safeguarded a $2B+ business development pipeline, ensuring consistent follow-through across 30+ strategic relationships. When Polymarket closed its $125M Series C at a $1.2B valuation, the intelligence reports and investor materials I prepared were core to that outcome.</p>
+        <p>I engineered AI-driven hiring pipelines that cut time-to-hire by half for FP&A leads, Controllers, and Senior Finance Managers. And I embedded holistic executive support: coaching readiness, presentation preparation, health, and personal priorities to sustain performance at the highest level.</p>
+        <div class="case-metrics">
+          <div class="cm"><div class="cm-v">4 months</div><div class="cm-l">Director to VP</div></div>
+          <div class="cm"><div class="cm-v">$9B</div><div class="cm-l">Post-Money Valuation</div></div>
+          <div class="cm"><div class="cm-v">$2B+</div><div class="cm-l">Pipeline Safeguarded</div></div>
+          <div class="cm"><div class="cm-v">30+</div><div class="cm-l">Strategic Partners</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TIMELINE ═══ -->
+<section class="timeline" id="path">
+  <div class="w">
+    <div class="tl-head rv">
+      <div class="lb">Career Path</div>
+      <h2>From the <span class="hl">lab</span> to the boardroom</h2>
+    </div>
+
+    <div class="tl-item rv">
+      <div class="tl-date">Nov 2024 / Present</div>
+      <div class="tl-line"></div>
+      <div class="tl-content">
+        <div class="tl-co">Athena</div>
+        <div class="tl-role">Executive Partner at Polymarket</div>
+        <p>Strategic operations, investor readiness, AI-driven hiring, pipeline management, and executive capacity design at billion-dollar scale.</p>
+      </div>
+    </div>
+
+    <div class="tl-item rv">
+      <div class="tl-date">Nov 2023 / Feb 2024</div>
+      <div class="tl-line"></div>
+      <div class="tl-content">
+        <div class="tl-co">St. Jude Family Hospital</div>
+        <div class="tl-role">Medical Intern</div>
+        <p>350+ documented case notes. Cross-functional coordination with nursing teams. Built the diagnostic rigor and composure that now define my executive work.</p>
+      </div>
+    </div>
+
+    <div class="tl-item rv">
+      <div class="tl-date">Sep / Dec 2019</div>
+      <div class="tl-line"></div>
+      <div class="tl-content">
+        <div class="tl-co">Globetek Science Foundation</div>
+        <div class="tl-role">Biotech Intern</div>
+        <p>100+ molecular biology procedures at 98% accuracy. Interdisciplinary collaboration under stringent safety protocols.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EXPERTISE ═══ -->
+<section class="expertise" id="expertise">
+  <div class="w">
+    <div class="ex-head rv">
+      <div class="lb">Expertise</div>
+      <h2>What I <span class="hl">build</span></h2>
+    </div>
+    <div class="ex-grid">
+      <div class="ex-card rv"><div class="ex-n">01</div><h3>Information Architecture</h3><p>Turning raw data, earnings calls, and research into decision-ready intelligence at executive speed.</p></div>
+      <div class="ex-card rv d1"><div class="ex-n">02</div><h3>Capacity Design</h3><p>Calendar architecture, ruthless prioritization, and systems that protect 30+ hours of focus time every week.</p></div>
+      <div class="ex-card rv d2"><div class="ex-n">03</div><h3>Pipeline Operations</h3><p>Multi-billion dollar pipeline tracking with zero dropped threads across 30+ relationships.</p></div>
+      <div class="ex-card rv"><div class="ex-n">04</div><h3>AI-Driven Hiring</h3><p>Automated sourcing and screening pipelines. 50% reduction in time-to-hire for senior finance roles.</p></div>
+      <div class="ex-card rv d1"><div class="ex-n">05</div><h3>Investor Readiness</h3><p>Materials, briefs, and preparation that turn fundraising meetings into closed rounds.</p></div>
+      <div class="ex-card rv d2"><div class="ex-n">06</div><h3>Holistic Performance</h3><p>Coaching prep, presentation readiness, health and wellness integration. Sustained peak performance.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOOLS ═══ -->
+<div class="tools-strip">
+  <div class="w">
+    <div class="tools-inner rv">
+      <span>Notion</span><span class="tools-sep">/</span>
+      <span>ClickUp</span><span class="tools-sep">/</span>
+      <span>Asana</span><span class="tools-sep">/</span>
+      <span>Google Workspace</span><span class="tools-sep">/</span>
+      <span>Microsoft 365</span><span class="tools-sep">/</span>
+      <span>Slack</span><span class="tools-sep">/</span>
+      <span>Ashby</span><span class="tools-sep">/</span>
+      <span>OpenAI</span><span class="tools-sep">/</span>
+      <span>Apps Script</span><span class="tools-sep">/</span>
+      <span>n8n</span><span class="tools-sep">/</span>
+      <span>Canva</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EDUCATION ═══ -->
+<section class="edu">
+  <div class="w rv">
+    <div class="lb">Education</div>
+    <div class="edu-row">
+      <div class="edu-mark"></div>
+      <div>
+        <div class="edu-deg">Bachelor of Science in Medical Biology</div>
+        <div class="edu-sch">University of Santo Tomas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section class="contact" id="contact">
+  <div class="w">
+    <div class="rv">
+      <div class="lb" style="text-align:center">Let's Connect</div>
+      <h2>Ready to <span class="hl">compound</span><br>your leverage?</h2>
+      <p class="contact-p">I partner with leaders who need a strategic force multiplier. Someone who engineers systems, protects focus, and turns complexity into outcomes.</p>
+    </div>
+    <div class="cl-row rv d1">
+      <a href="mailto:arcangelkeithdaniel@gmail.com" class="cl">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        arcangelkeithdaniel@gmail.com
+      </a>
+      <a href="tel:+639297544371" class="cl">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +63 929 754 4371
+      </a>
+      <a href="https://www.linkedin.com/in/keith-arcangel/" target="_blank" rel="noopener" class="cl">
+        <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>&copy; 2026 Keith Daniel Arcangel</span>
+  <span>Metro Manila, Philippines</span>
+</footer>
+
+<script>
+/* Loader */
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    document.getElementById('loader').classList.add('gone');
+  }, 600);
+});
+
+/* Scroll progress */
+window.addEventListener('scroll', function() {
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  if (h > 0) {
+    document.getElementById('prog').style.width = (window.scrollY / h * 100) + '%';
+  }
+});
+
+/* Reveal on scroll */
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('v');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+
+document.querySelectorAll('.rv').forEach(function(el) {
+  obs.observe(el);
+});
+
+/* Counter animation */
+var cobs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (!e.isIntersecting) return;
+    var el = e.target;
+    var target = parseInt(el.getAttribute('data-t'), 10);
+    var dur = 1400;
+    var start = performance.now();
+    function tick(now) {
+      var p = Math.min((now - start) / dur, 1);
+      var ease = 1 - Math.pow(1 - p, 4);
+      el.textContent = Math.round(target * ease);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    cobs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.cnt').forEach(function(el) {
+  cobs.observe(el);
+});
+
+/* Mobile menu */
+var ham = document.getElementById('ham');
+var mbl = document.getElementById('mbl');
+ham.addEventListener('click', function() {
+  ham.classList.toggle('on');
+  mbl.classList.toggle('on');
+  document.body.style.overflow = mbl.classList.contains('on') ? 'hidden' : '';
+});
+mbl.querySelectorAll('a').forEach(function(a) {
+  a.addEventListener('click', function() {
+    ham.classList.remove('on');
+    mbl.classList.remove('on');
+    document.body.style.overflow = '';
+  });
+});
+
+/* Smooth scroll */
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    var t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
